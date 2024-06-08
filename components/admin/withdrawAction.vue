@@ -1,16 +1,11 @@
 <template>
-  <v-dialog
-    v-model="modal"
-    persistent
-  >
+  <v-dialog v-model="modal" persistent elevation-1>
     <v-card :loading="loading.withdraw" flat max-width="300" class="mx-auto">
       <v-card-title class="text-subtitle-1 font-weight-medium text-uppercase">
         Action
         <v-spacer />
         <v-btn small outlined icon @click="toggle(false, {})">
-          <v-icon size="20">
-            mdi-close
-          </v-icon>
+          <v-icon size="20"> mdi-close </v-icon>
         </v-btn>
       </v-card-title>
       <v-card-text class="">
@@ -25,6 +20,7 @@
           <v-col cols="6" class="px-1">
             <v-btn
               depressed
+              :disabled="withdraw && withdraw.status != 'pending'"
               block
               color="error"
               class="text-capitalize rounded text-subtitle-2 font-weight-regular ma-0"
@@ -37,6 +33,7 @@
             <v-btn
               depressed
               block
+              :disabled="withdraw && withdraw.status != 'pending'"
               color="success"
               class="text-capitalize rounded text-subtitle-2 font-weight-regular ma-0"
               @click="update('success')"
@@ -51,57 +48,54 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from "vuex";
 export default {
   props: {
     withdraw: Object,
     modal: {
       type: Boolean,
-      default: false
+      default: false,
     },
     toggle: {
-      type: Function
-    }
+      type: Function,
+    },
   },
   data: () => ({
-    size: 70
+    size: 70,
   }),
   computed: {
-    ...mapGetters({ loading: 'admin/getLoading' })
-
+    ...mapGetters({ loading: "admin/getLoading" }),
   },
   methods: {
-    ...mapActions({ updatewithdraw: 'admin/updateTransactions' }),
-    update (status) {
+    ...mapActions({ updatewithdraw: "admin/updateTransactions" }),
+    update(status) {
       const payload = {
         ID: this.withdraw.withdrawID,
         transactionID: this.withdraw.transactionID,
         status,
-        message: `Transaction ${status === 'success' ? 'Approved' : 'Declined'}`,
-        type: 'withdraw',
-        amount: parseInt(this.withdraw.amount.split(',').join('').slice(1)),
-        userID: this.withdraw.userID
-      }
+        message: `Transaction ${
+          status === "success" ? "Approved" : "Declined"
+        }`,
+        type: "withdraw",
+        amount: parseInt(this.withdraw.amount),
+        userID: this.withdraw.userID,
+      };
 
-      this.updatewithdraw(payload)
-      this.checkIfDone()
+      this.updatewithdraw(payload);
+      this.checkIfDone();
     },
-    checkIfDone () {
+    checkIfDone() {
       setInterval(() => {
         if (!this.loading.withdraw) {
           setTimeout(() => {
-            this.toggle(false, {})
-            window.location.reload()
-          }, 2000)
+            this.toggle(false, {});
+            window.location.reload();
+          }, 2000);
         }
-      }, 1000)
-    }
-
-  }
-
-}
+      }, 1000);
+    },
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>

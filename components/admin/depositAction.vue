@@ -1,16 +1,11 @@
 <template>
-  <v-dialog
-    v-model="modal"
-    persistent
-  >
+  <v-dialog v-model="modal" persistent>
     <v-card :loading="loading.deposit" flat max-width="300" class="mx-auto">
       <v-card-title class="text-subtitle-1 font-weight-medium text-uppercase">
         Action
         <v-spacer />
         <v-btn small outlined icon @click="toggle(false, {})">
-          <v-icon size="20">
-            mdi-close
-          </v-icon>
+          <v-icon size="20"> mdi-close </v-icon>
         </v-btn>
       </v-card-title>
       <v-card-text class="">
@@ -21,6 +16,7 @@
           <v-col cols="6" class="px-1">
             <v-btn
               depressed
+              :disabled="deposit && deposit.status != 'pending'"
               block
               color="error"
               class="text-capitalize rounded text-subtitle-2 font-weight-regular ma-0"
@@ -32,6 +28,7 @@
           <v-col cols="6" class="px-1">
             <v-btn
               depressed
+              :disabled="deposit && deposit.status != 'pending'"
               block
               color="success"
               class="text-capitalize rounded text-subtitle-2 font-weight-regular ma-0"
@@ -47,57 +44,54 @@
 </template>
 
 <script>
-import { mapGetters, mapActions } from 'vuex'
+import { mapGetters, mapActions } from "vuex";
 export default {
   props: {
     deposit: Object,
     modal: {
       type: Boolean,
-      default: false
+      default: false,
     },
     toggle: {
-      type: Function
-    }
+      type: Function,
+    },
   },
   data: () => ({
-    size: 70
+    size: 70,
   }),
   computed: {
-    ...mapGetters({ loading: 'admin/getLoading' })
-
+    ...mapGetters({ loading: "admin/getLoading" }),
   },
   methods: {
-    ...mapActions({ updateDeposit: 'admin/updateTransactions' }),
-    update (status) {
+    ...mapActions({ updateDeposit: "admin/updateTransactions" }),
+    update(status) {
       const payload = {
         ID: this.deposit.depositID,
         transactionID: this.deposit.transactionID,
         status,
-        message: `Transaction ${status === 'success' ? 'Approved' : 'Declined'}`,
-        type: 'deposit',
-        amount: parseInt(this.deposit.amount.split(',').join('').slice(1)),
-        userID: this.deposit.userID
-      }
+        message: `Transaction ${
+          status === "success" ? "Approved" : "Declined"
+        }`,
+        type: "deposit",
+        amount: parseInt(this.deposit.amount.split(",").join("").slice(1)),
+        userID: this.deposit.userID,
+      };
 
-      this.updateDeposit(payload)
-      this.checkIfDone()
+      this.updateDeposit(payload);
+      this.checkIfDone();
     },
-    checkIfDone () {
+    checkIfDone() {
       setInterval(() => {
         if (!this.loading.deposit) {
           setTimeout(() => {
-            this.toggle(false, {})
-            window.location.reload()
-          }, 2000)
+            this.toggle(false, {});
+            window.location.reload();
+          }, 2000);
         }
-      }, 1000)
-    }
-
-  }
-
-}
+      }, 1000);
+    },
+  },
+};
 </script>
 
-<style>
-
-</style>
+<style></style>
